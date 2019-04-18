@@ -12,17 +12,26 @@ php artisan vendor:publish --provider="Spinon\\UccelloArchive\\Providers\\AppSer
 
 
 
-Once installation is done, you need to create a new listing view to override Uccello's. Put the code below into resources/views/uccello/modules/default/list/main.blade.php :
+Once installation is done, you need to alter your models tables through migrations to add the 'archived_at' field :
 
-```php+HTML
+```php
+$table->dateTime('archived_at')->nullable();
+```
+
+**Note** : if you want to use a different field name, you'll need to override the $ARCHIVED_AT variable in the model using the ArchiveTrait :
+
+```php
+public static $ARCHIVED_AT = 'custom_fiedname';
+```
+
+
+
+Then you need to create a new listing view to override Uccello's. Put the code below into resources/views/uccello/modules/default/list/main.blade.php :
+
+```html
 @extends('uccello::modules.default.list.main')
 
 @section('script')
-    {{-- Put your global JS files here --}}
-
-    {{-- Uncomment below to load js/app.js with Mix --}}
-    {{-- {!! Html::script(mix('js/app.js')) !!} --}}
-
     {!! Html::script(mix('js/autoloader.js', 'vendor/spinon/uccello-archive')) !!}
 @endsection
 
@@ -74,9 +83,9 @@ Once installation is done, you need to create a new listing view to override Ucc
 
 
 
-Then, to use the ArchiveTrait, you need to add these lines to the corresponding Models :
+Finally, to use the ArchiveTrait, you need to add these lines to the corresponding Models :
 
-```
+```php
 use Spinon\UccelloArchive\Traits\ArchiveTrait;
 
 class MyModel extends Model

@@ -24,12 +24,15 @@ class ListController extends UccelloListController {
     {
         $query = parent::buildContentQuery();
 
+        $module = $this->module;
+        $modelClass = $module->model_class;
+
         $filter = request('filter');
-        if (isset($filter)) {
+        if (isset($filter) && (new $modelClass)->isArchivable()) {
             if ($filter == 'archived') {
-                $query = $query->withoutGlobalScope(ArchiveScope::class)->whereNotNull('archived_at');
+                $query = $query->withoutGlobalScope(ArchiveScope::class)->whereNotNull((new $modelClass)->getArchivedAtColumn());
             } else if ($filter == 'unarchived') {
-                $query = $query->withoutGlobalScope(ArchiveScope::class)->whereNull('archived_at');
+                $query = $query->withoutGlobalScope(ArchiveScope::class)->whereNull((new $modelClass)->getArchivedAtColumn());
             } else {
                 $query = $query->withoutGlobalScope(ArchiveScope::class);
             }
